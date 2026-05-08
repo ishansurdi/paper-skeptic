@@ -96,4 +96,29 @@ The app includes an in-memory IP-based rate limiter for /analyze to protect API 
 ## Deployment note
 
 Current rate limiting is in-memory, which is fine for a single instance.
+For multi-instance deployment, use a shared store (for example Redis) for global limits.
 
+
+## Deploy to Vercel
+
+This repo is configured for Vercel with:
+
+- api/index.py: serverless entrypoint that exposes FastAPI app
+- vercel.json: routes all requests to FastAPI and bundles static files
+
+### Steps
+
+1. Push latest code to GitHub.
+2. In Vercel, click New Project and import the repository.
+3. Keep framework preset as Other.
+4. Add environment variables in Vercel project settings:
+	- GEMINI_API_KEY
+	- OPENAI (optional)
+	- RATE_LIMIT_REQUESTS
+	- RATE_LIMIT_WINDOW_SECONDS
+5. Deploy.
+
+### Optional recommended production tweak
+
+Vercel serverless can spin up multiple instances, so in-memory rate limiting is instance-local.
+If you need hard global limits, move rate limiting to shared storage (for example Redis/Upstash).
