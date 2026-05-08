@@ -1,4 +1,5 @@
 import asyncio
+import inspect
 import json
 import os
 import re
@@ -241,10 +242,19 @@ def _call_gemini_for_pdf(
         temp_pdf_path = temp_file.name
 
     try:
-        uploaded_file = client.files.upload(
-            path=temp_pdf_path,
-            config=types.UploadFileConfig(mime_type="application/pdf"),
-        )
+        upload_signature = inspect.signature(client.files.upload)
+        upload_kwargs: dict[str, Any] = {
+            "config": types.UploadFileConfig(mime_type="application/pdf"),
+        }
+
+        if "path" in upload_signature.parameters:
+            upload_kwargs["path"] = temp_pdf_path
+            uploaded_file = client.files.upload(**upload_kwargs)
+        elif "file" in upload_signature.parameters:
+            upload_kwargs["file"] = temp_pdf_path
+            uploaded_file = client.files.upload(**upload_kwargs)
+        else:
+            uploaded_file = client.files.upload(temp_pdf_path, **upload_kwargs)
     finally:
         if temp_pdf_path and os.path.exists(temp_pdf_path):
             os.remove(temp_pdf_path)
