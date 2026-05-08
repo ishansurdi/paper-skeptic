@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Paper Skeptic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,600;6..72,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="masthead">
+        <p class="wordmark">paper skeptic</p>
+        <p class="tagline">what is this paper not telling you</p>
+      </header>
+
+      <section id="composer" class="composer" aria-label="Submit paper URL">
+        <form id="analyze-form" novalidate>
+          <label for="arxiv-url" class="visually-hidden">arXiv URL</label>
+          <input
+            id="arxiv-url"
+            name="arxiv_url"
+            type="text"
+            placeholder="paste an arxiv link"
+            required
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="submit">analyze</button>
+        </form>
+        <p id="error-message" class="error-message" aria-live="polite"></p>
+      </section>
+
+      <section id="loading" class="loading" hidden aria-live="polite" aria-busy="true">
+        <p id="loading-text">reading</p>
+      </section>
+
+      <article id="results" class="results" hidden aria-live="polite">
+        <header class="results-topbar">
+          <a href="#" id="analyze-another">analyze another</a>
+        </header>
+
+        <section aria-labelledby="claims-heading">
+          <h2 id="claims-heading" class="section-title">what this paper claims</h2>
+          <p id="summary" class="summary"></p>
+        </section>
+
+        <hr class="section-rule" />
+
+        <section class="doubts-section" aria-labelledby="doubts-heading">
+          <h2 id="doubts-heading" class="section-title">what it isn't telling you</h2>
+          <ol id="doubts-list" class="doubts-list"></ol>
+          <p id="doubts-note" class="doubts-note" hidden></p>
+        </section>
+      </article>
+    </main>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
