@@ -13,7 +13,7 @@ import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from google import genai
 from google.genai import types
@@ -68,6 +68,7 @@ MODEL_NAME = "gemini-3-flash-preview"
 MIN_PDF_BYTES = 10 * 1024
 MAX_PDF_BYTES = 50 * 1024 * 1024
 MAX_GEMINI_WAIT_SECONDS = 60.0
+PDF_DOWNLOAD_TIMEOUT = httpx.Timeout(60.0, connect=20.0)
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "5"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "3600"))
 
@@ -343,6 +344,11 @@ def read_index() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
 
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon() -> Response:
+    return Response(status_code=204)
+
+
 @app.post("/analyze")
 async def analyze_paper(request: Request, payload: AnalyzeRequest) -> dict[str, Any]:
     await _enforce_analyze_rate_limit(request)
@@ -353,7 +359,7 @@ async def analyze_paper(request: Request, payload: AnalyzeRequest) -> dict[str, 
     paper_id, pdf_url = normalize_arxiv_pdf_url(payload.arxiv_url)
 
     try:
-        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+        async with httpx.AsyncClient(timeout=PDF_DOWNLOAD_TIMEOUT, follow_redirects=True) as client:
             response = await client.get(pdf_url)
             response.raise_for_status()
             pdf_bytes = response.content

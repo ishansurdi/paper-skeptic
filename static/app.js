@@ -150,6 +150,10 @@ async function submitForAnalysis(arxivUrl) {
       const detail = payload?.detail || 'request timed out. try again.';
       throw new Error(`TIMEOUT_ERROR:${detail}`);
     }
+    if (response.status === 502) {
+      const detail = payload?.detail || 'upstream model/download error. try again.';
+      throw new Error(`BACKEND_ERROR:${detail}`);
+    }
     if (response.status >= 500) {
       throw new Error('SERVER_ERROR');
     }
@@ -196,6 +200,11 @@ form.addEventListener('submit', async (event) => {
 
     if (message === 'SERVER_ERROR') {
       showComposerWithError('something broke. try again.');
+      return;
+    }
+
+    if (message.startsWith('BACKEND_ERROR:')) {
+      showComposerWithError(message.replace('BACKEND_ERROR:', ''));
       return;
     }
 
