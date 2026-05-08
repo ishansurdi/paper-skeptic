@@ -96,4 +96,4 @@ The app includes an in-memory IP-based rate limiter for /analyze to protect API 
 ## Deployment note
 
 Current rate limiting is in-memory, which is fine for a single instance.
-For multi-instance deployment, use a shared store (for example Redis) for global limits.
+
